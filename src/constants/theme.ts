@@ -24,6 +24,22 @@ export const Colors = {
   },
 } as const;
 
+/** Palette from Figma Login_page (desktop → mobile adaptation) */
+export const LoginColors = {
+  canvas: '#2c2926',
+  card: '#141210',
+  cardBorder: '#d4d0cb',
+  brand: '#f7f5f3',
+  title: '#d4d0cb',
+  fieldFill: '#5c5752',
+  fieldBorder: '#b5b0aa',
+  fieldText: '#f7f5f3',
+  fieldPlaceholder: '#b5b0aa',
+  cta: '#b9ffbb',
+  ctaText: '#44403c',
+  link: '#ebe8e5',
+} as const;
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
