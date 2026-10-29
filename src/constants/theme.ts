@@ -13,15 +13,18 @@ export const Colors = {
     background: '#ffffff',
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    textSecondary: '#60646C'
   },
   dark: {
     text: '#ffffff',
     background: '#000000',
     backgroundElement: '#212225',
     backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    textSecondary: '#B0B4BA'
   },
+  default: {
+    white: "#ffffff"
+  }
 } as const;
 
 /** Palette from Figma Login_page (desktop → mobile adaptation) */
@@ -38,6 +41,25 @@ export const LoginColors = {
   cta: '#b9ffbb',
   ctaText: '#44403c',
   link: '#ebe8e5',
+} as const;
+
+export const HomeColors = {
+  canvas: '#2c2926',
+  card: '#141210',
+  cardBorder: '#d4d0cb',
+  brand: '#f7f5f3',
+  nowPlaying: '#b9ffbb',
+  trackTitle: '#fafafa',
+  trackMeta: '#ebe8e5',
+  cta: '#b9ffbb',
+  ctaText: '#44403c',
+  switchOn: '#3ac033',
+  switchKnob: '#fafafa',
+  accept: '#3ac033',
+  reject: '#ff383c',
+  coverGlow: '#b58663',
+  marker: '#b9ffbb',
+  markerPulse: '#3ac033',
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;

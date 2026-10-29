@@ -29,7 +29,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-
+  
       <Image
         source={require('@/assets/images/login-map.png')}
         style={StyleSheet.absoluteFill}
