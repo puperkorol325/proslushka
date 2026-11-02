@@ -1,3 +1,5 @@
+import Map from '@/components/map';
+import { Colors, HomeColors, Spacing } from '@/constants/theme';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -10,8 +12,6 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { Colors, HomeColors, Spacing } from '@/constants/theme';
 
 const LIKED_USERS = [
   { id: '1', name: 'WHODAFCKRU', avatar: require('@/assets/images/home/avatar-1.png') },
@@ -29,25 +29,9 @@ export default function HomeScreen() {
       <StatusBar style="light" />
 
       <View style={[StyleSheet.absoluteFill, styles.map]}>
-        <Image
-          source={require('@/assets/images/home/map.png')}
+        <Map
           style={styles.mapImage}
-          contentFit="cover"
         />
-        <View style={[styles.pulseMarker, styles.pulsePrimary]}>
-          <View style={styles.pulseOuter} />
-          <View style={styles.pulseMid} />
-          <Image
-            source={require('@/assets/images/home/logo.png')}
-            style={styles.pulseAvatar}
-            contentFit="cover"
-          />
-        </View>
-        <View style={[styles.pulseMarker, styles.pulseSecondary]}>
-          <View style={[styles.pulseOuter, styles.pulseOuterAccent]} />
-          <View style={[styles.pulseMid, styles.pulseMidAccent]} />
-          <View style={styles.pulseDot} />
-        </View>
       </View>
 
       <View style={[
