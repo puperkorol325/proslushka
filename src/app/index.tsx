@@ -1,8 +1,9 @@
 import Map from '@/components/map';
-import { Colors, HomeColors, Spacing } from '@/constants/theme';
+import { HomeColors, Spacing } from '@/constants/theme';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   Text,
   View
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LIKED_USERS = [
@@ -24,113 +26,118 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [isPlaying, setIsPlaying] = useState(true);
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ['10%', '25%'], []);
+
   return (
-    <View style={styles.root}>
-      <StatusBar style="light" />
+    <GestureHandlerRootView>
+      <View style={styles.root}>
+        <StatusBar style="light" />
 
-      <View style={[StyleSheet.absoluteFill, styles.map]}>
-        <Map
-          style={styles.mapImage}
-        />
-      </View>
+        <View style={[StyleSheet.absoluteFill, styles.map]}>
+          <Map
+            style={styles.mapImage}
+          />
+        </View>
 
-      <View style={[
-          styles.wrapper,
-          {
-            paddingTop: insets.top,
-            paddingLeft: insets.left,
-            paddingRight: insets.right,
-            paddingBottom: insets.bottom
-          }
-        ]}>
+        <View style={[
+            styles.wrapper,
+            {
+              paddingTop: insets.top,
+              paddingLeft: insets.left,
+              paddingRight: insets.right,
+              paddingBottom: insets.bottom
+            }
+          ]}>
 
-        <Image
-          source={require('@/assets/images/home/logo.png')}
-          style={styles.logo}
-          contentFit="cover"
-        />
-
-        <View 
-          style={styles.card}
-          >
-          <View style={styles.draggableContainer}>
-            <View style={styles.draggable} />
-          </View>
-          <View style={styles.nowPlayingRow}>
-            <Text style={styles.nowPlayingLabel}>СЕЙЧАС ИГРАЕТ</Text>
-            <Switch
-              value={isPlaying}
-              onValueChange={setIsPlaying}
-              trackColor={{ false: '#5c5752', true: HomeColors.switchOn }}
-              thumbColor={HomeColors.switchKnob}
-              ios_backgroundColor="#5c5752"
-            />
-          </View>
-          <View style={styles.trackBlock}>
-            <View style={styles.coverWrapper}>
-              <Image
-                source={require('@/assets/images/home/cover.png')}
-                style={styles.cover}
-                contentFit="cover"
-              />
-            </View>
-            <View style={styles.trackMeta}>
-              <Text style={styles.trackTitle} numberOfLines={2}>
-                YAYA TOURE
-              </Text>
-              <Text style={styles.trackArtists} numberOfLines={1}>
-                glaive, kurtains
-              </Text>
-              <Text style={styles.trackAlbum} numberOfLines={1}>
-                God Save the Three
-              </Text>
-            </View>
-          </View>
-          <Pressable
-            style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
-            accessibilityRole="button"
-            accessibilityLabel="Сменить трек">
-            <Text style={styles.ctaText}>Сменить трек</Text>
-          </Pressable>
-          <Text style={styles.likesTitle}>ЛАЙКИ КОМПОЗИЦИИ</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.likesRow}>
-            {LIKED_USERS.map((user) => (
-              <View key={user.id} style={styles.likedUser}>
-                <Image source={user.avatar} style={styles.avatar} contentFit="cover" />
-                <Text style={styles.username} numberOfLines={1}>
-                  {user.name}
-                </Text>
-                <View style={styles.actionRow}>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.actionBtn,
-                      styles.acceptBtn,
-                      pressed && styles.pressed,
-                    ]}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Принять ${user.name}`}>
-                    <Text style={styles.actionIcon}>✓</Text>
-                  </Pressable>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.actionBtn,
-                      styles.rejectBtn,
-                      pressed && styles.pressed,
-                    ]}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Отклонить ${user.name}`}>
-                    <Text style={styles.actionIcon}>✕</Text>
-                  </Pressable>
+          <Image
+            source={require('@/assets/images/home/logo.png')}
+            style={styles.logo}
+            contentFit="cover"
+          />
+          <BottomSheet
+            snapPoints={snapPoints}
+            ref={bottomSheetRef}
+            backgroundStyle={{ backgroundColor: HomeColors.card }}
+            handleIndicatorStyle={{ backgroundColor: "#ffffff" }}>
+            <BottomSheetView style={styles.card}>
+              <View style={styles.nowPlayingRow}>
+                <Text style={styles.nowPlayingLabel}>СЕЙЧАС ИГРАЕТ</Text>
+                <Switch
+                  value={isPlaying}
+                  onValueChange={setIsPlaying}
+                  trackColor={{ false: '#5c5752', true: HomeColors.switchOn }}
+                  thumbColor={HomeColors.switchKnob}
+                  ios_backgroundColor="#5c5752"
+                />
+              </View>
+              <View style={styles.trackBlock}>
+                <View style={styles.coverWrapper}>
+                  <Image
+                    source={require('@/assets/images/home/cover.png')}
+                    style={styles.cover}
+                    contentFit="cover"
+                  />
+                </View>
+                <View style={styles.trackMeta}>
+                  <Text style={styles.trackTitle} numberOfLines={2}>
+                    YAYA TOURE
+                  </Text>
+                  <Text style={styles.trackArtists} numberOfLines={1}>
+                    glaive, kurtains
+                  </Text>
+                  <Text style={styles.trackAlbum} numberOfLines={1}>
+                    God Save the Three
+                  </Text>
                 </View>
               </View>
-            ))}
-          </ScrollView>
+              <Pressable
+                style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
+                accessibilityRole="button"
+                accessibilityLabel="Сменить трек">
+                <Text style={styles.ctaText}>Сменить трек</Text>
+              </Pressable>
+              <Text style={styles.likesTitle}>ЛАЙКИ КОМПОЗИЦИИ</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.likesRow}>
+                {LIKED_USERS.map((user) => (
+                  <View key={user.id} style={styles.likedUser}>
+                    <Image source={user.avatar} style={styles.avatar} contentFit="cover" />
+                    <Text style={styles.username} numberOfLines={1}>
+                      {user.name}
+                    </Text>
+                    <View style={styles.actionRow}>
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.actionBtn,
+                          styles.acceptBtn,
+                          pressed && styles.pressed,
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Принять ${user.name}`}>
+                        <Text style={styles.actionIcon}>✓</Text>
+                      </Pressable>
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.actionBtn,
+                          styles.rejectBtn,
+                          pressed && styles.pressed,
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Отклонить ${user.name}`}>
+                        <Text style={styles.actionIcon}>✕</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            </BottomSheetView>
+          </BottomSheet>
         </View>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -150,9 +157,10 @@ const styles = StyleSheet.create({
     position: 'relative',
     flex: 1,
   },
+  bottomSheet: {
+    backgroundColor: HomeColors.card
+  },
   card: {
-    position: 'absolute',
-    bottom: 0,
     backgroundColor: HomeColors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -165,17 +173,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 8,
-  },
-  draggableContainer: {
-    width: '100%',
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  draggable: {
-    width: 100,
-    height: 3,
-    backgroundColor: Colors.default.white
   },
   logo: {
     width: 64,
