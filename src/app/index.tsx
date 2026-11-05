@@ -1,3 +1,4 @@
+import FindSongModal from '@/components/FindSongModal';
 import Map from '@/components/map';
 import { HomeColors, Spacing } from '@/constants/theme';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -6,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useMemo, useRef, useState } from 'react';
 import {
   Pressable,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -18,16 +18,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const LIKED_USERS = [
   { id: '1', name: 'WHODAFCKRU', avatar: require('@/assets/images/home/avatar-1.png') },
   { id: '2', name: 'THAIBADDIE', avatar: require('@/assets/images/home/avatar-2.png') },
-  { id: '3', name: 'IDCIDCIDC', avatar: require('@/assets/images/home/avatar-3.png') },
-  { id: '4', name: 'LEEENEFOR', avatar: require('@/assets/images/home/avatar-4.png') },
+  { id: '3', name: 'IDCIDCIDC', avatar: require('@/assets/images/home/avatar-3.png') }
 ] as const;
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [isPlaying, setIsPlaying] = useState(true);
+  const [findSongVisible, setFindSongVisible] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['10%', '25%'], []);
+
+  const onMapClick = (): void => {
+    bottomSheetRef.current?.snapToPosition('25%');
+  };
 
   return (
     <GestureHandlerRootView>
@@ -36,6 +40,7 @@ export default function HomeScreen() {
 
         <View style={[StyleSheet.absoluteFill, styles.map]}>
           <Map
+            onPress={onMapClick}
             style={styles.mapImage}
           />
         </View>
@@ -56,6 +61,7 @@ export default function HomeScreen() {
             contentFit="cover"
           />
           <BottomSheet
+            index={2}
             snapPoints={snapPoints}
             ref={bottomSheetRef}
             backgroundStyle={{ backgroundColor: HomeColors.card }}
@@ -92,16 +98,15 @@ export default function HomeScreen() {
                 </View>
               </View>
               <Pressable
+                onPress={() => setFindSongVisible(true)}
                 style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
                 accessibilityRole="button"
                 accessibilityLabel="Сменить трек">
                 <Text style={styles.ctaText}>Сменить трек</Text>
               </Pressable>
               <Text style={styles.likesTitle}>ЛАЙКИ КОМПОЗИЦИИ</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.likesRow}>
+              <View
+                style={styles.likesRow}>
                 {LIKED_USERS.map((user) => (
                   <View key={user.id} style={styles.likedUser}>
                     <Image source={user.avatar} style={styles.avatar} contentFit="cover" />
@@ -132,10 +137,15 @@ export default function HomeScreen() {
                     </View>
                   </View>
                 ))}
-              </ScrollView>
+              </View>
             </BottomSheetView>
           </BottomSheet>
         </View>
+
+        <FindSongModal
+          visible={findSongVisible}
+          onClose={() => setFindSongVisible(false)}
+        />
       </View>
     </GestureHandlerRootView>
   );
@@ -263,6 +273,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   likesRow: {
+    display: "flex",
+    flexDirection: "row",
     gap: Spacing.four,
     paddingRight: Spacing.two,
   },

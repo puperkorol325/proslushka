@@ -4,9 +4,10 @@ import mapCustomization from "../../proslushka_map_customization.json";
 
 type MapProps = {
     style: {[key: string]: any };
+    onPress?: (e?: any) => void;
 };
 
-const Map: React.FC<MapProps> = ({ style }) => {
+const Map: React.FC<MapProps> = ({ style, onPress }) => {
 
     return (
         <Yamap 
@@ -16,6 +17,7 @@ const Map: React.FC<MapProps> = ({ style }) => {
                 lon: 37.3,
                 zoom: 11
             }}
+            onMapPress={onPress}
             nightMode={true}
             mapStyle={JSON.stringify(mapCustomization)}
             />
