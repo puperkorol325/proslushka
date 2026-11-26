@@ -1,8 +1,10 @@
 import { HomeColors, LoginColors, Spacing } from '@/constants/theme';
-import getSongsByQuery from '@/services/GetSongsByQuery';
+import getSongsByQuery from '@/services/deezer/searchTracks';
+import { TrackItem } from '@/types/TrackItem';
 import { Image } from 'expo-image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -12,16 +14,6 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-export type TrackItem = {
-  id: string;
-  title: string;
-  artist: string;
-  coverURI?: string;
-  previewUrl?: string;
-};
-
-const shownTracks: TrackItem[] = [];
 
 type FindSongModalProps = {
   visible: boolean;
@@ -33,18 +25,21 @@ export default function FindSongModal({ visible, onClose, onSelect }: FindSongMo
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<TrackItem[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    async function fetchSongs() {
-      setSongs(await getSongsByQuery(query));
-    }
+    setIsLoading(true);
+    clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      async function fetchSongs() {
+        setSongs(await getSongsByQuery(query));
+        setIsLoading(false);
+      } 
 
-    fetchSongs();
+      fetchSongs();
+    }, 1000);
   }, [query]);
-
-  useEffect(() => {
-
-  }, [songs]);
 
   const handleSelect = (track: TrackItem) => {
     onSelect?.(track);
@@ -102,6 +97,9 @@ export default function FindSongModal({ visible, onClose, onSelect }: FindSongMo
             contentContainerStyle={styles.listContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}>
+            {isLoading && (
+              <ActivityIndicator />
+            )}
             {songs?.length === 0 ? (
               <Text style={styles.emptyText}>Ничего не найдено</Text>
             ) : (

@@ -1,13 +1,12 @@
-import { TrackItem } from "@/components/FindSongModal";
+import { TrackItem } from "@/types/TrackItem";
+import { DeezerResponse } from "./types/DeezerResponse";
 
-const SEARCH_COOLDOWN_TIME = 1500;
+const SEARCH_COOLDOWN_TIME = 500;
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingResolvers: Array<{
     resolve: (v: DeezerResponse) => void;
     reject: (e: unknown) => void;
 }> = [];
-
-type DeezerResponse = any | null;
 
 export default async function getSongsByQuery(query: string): Promise<TrackItem[] | null> {
 
