@@ -1,6 +1,7 @@
 import { HomeColors, LoginColors, Spacing } from '@/constants/theme';
+import getSongsByQuery from '@/services/GetSongsByQuery';
 import { Image } from 'expo-image';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -16,41 +17,11 @@ export type TrackItem = {
   id: string;
   title: string;
   artist: string;
-  cover: number;
+  coverURI?: string;
+  previewUrl?: string;
 };
 
-const MOCK_TRACKS: TrackItem[] = [
-  {
-    id: '1',
-    title: 'YAYA TOURE',
-    artist: 'glaive, kurtains',
-    cover: require('@/assets/images/home/cover.png'),
-  },
-  {
-    id: '2',
-    title: 'Bloodbath (Dance)',
-    artist: 'kmoe',
-    cover: require('@/assets/images/home/cover.png'),
-  },
-  {
-    id: '3',
-    title: 'Йупи Йо',
-    artist: 'Scally Milano',
-    cover: require('@/assets/images/home/cover.png'),
-  },
-  {
-    id: '4',
-    title: 'God Save the Three',
-    artist: 'glaive',
-    cover: require('@/assets/images/home/cover.png'),
-  },
-  {
-    id: '5',
-    title: 'Night Drive',
-    artist: 'kurtains',
-    cover: require('@/assets/images/home/cover.png'),
-  },
-];
+const shownTracks: TrackItem[] = [];
 
 type FindSongModalProps = {
   visible: boolean;
@@ -61,15 +32,19 @@ type FindSongModalProps = {
 export default function FindSongModal({ visible, onClose, onSelect }: FindSongModalProps) {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
+  const [songs, setSongs] = useState<TrackItem[] | null>(null);
 
-  const filteredTracks = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return MOCK_TRACKS;
-    return MOCK_TRACKS.filter(
-      (track) =>
-        track.title.toLowerCase().includes(q) || track.artist.toLowerCase().includes(q)
-    );
+  useEffect(() => {
+    async function fetchSongs() {
+      setSongs(await getSongsByQuery(query));
+    }
+
+    fetchSongs();
   }, [query]);
+
+  useEffect(() => {
+
+  }, [songs]);
 
   const handleSelect = (track: TrackItem) => {
     onSelect?.(track);
@@ -127,17 +102,17 @@ export default function FindSongModal({ visible, onClose, onSelect }: FindSongMo
             contentContainerStyle={styles.listContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}>
-            {filteredTracks.length === 0 ? (
+            {songs?.length === 0 ? (
               <Text style={styles.emptyText}>Ничего не найдено</Text>
             ) : (
-              filteredTracks.map((track) => (
+              songs?.map((track) => (
                 <Pressable
                   key={track.id}
                   onPress={() => handleSelect(track)}
                   style={({ pressed }) => [styles.trackRow, pressed && styles.pressed]}
                   accessibilityRole="button"
                   accessibilityLabel={`${track.title}, ${track.artist}`}>
-                  <Image source={track.cover} style={styles.cover} contentFit="cover" />
+                  <Image source={{ uri: track.coverURI }} style={styles.cover} contentFit="cover" />
                   <View style={styles.trackMeta}>
                     <Text style={styles.trackTitle} numberOfLines={1}>
                       {track.title}
